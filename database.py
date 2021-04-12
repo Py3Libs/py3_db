@@ -1,10 +1,12 @@
 from dataclasses import dataclass
 import cx_Oracle
+import psycopg2
+import psycopg2.extras
 from abstracts.database import IDatabase
 
 
 @dataclass
-class OracleConfig:
+class ConnectConfig:
     host:str=""
     port:int=5673
     dbname:str=""
@@ -12,6 +14,7 @@ class OracleConfig:
     password:str=""
     encode:str="utf-8"
     tns:str=""
+    schema:str=""
 
 
 class OracleDatabase(IDatabase):
@@ -170,3 +173,113 @@ class OracleDatabase(IDatabase):
             raise e
 
 
+class PostgresDatabase(IDatabase):
+
+    def __init__(self, conn_config=None):
+        self.__conn_config = conn_config
+        self.__conn = None
+        self.__cursor = None
+
+    def open_conn(self):
+        try:
+            if not self.is_opened():
+                self.__conn = psycopg2.connect(
+                    host=self.__conn_config.host,
+                    user=self.__conn_config.username,
+                    password=self.__conn_config.password,
+                    port=self.__conn_config.port,
+                    dbname=self.__conn_config.dbname,
+                    options=f"-c search_path={self.__conn_config.schema}"
+                )
+
+        except Exception as e:
+            raise
+
+    def close_conn(self):
+        try:
+            if self.is_opened():
+                self.__conn.close()
+
+        except Exception as e:
+            raise
+
+    def is_opened(self) -> bool:
+        try:
+            if self.__conn is not None and self.__conn.closed == 0:
+                return True
+
+            return False
+
+        except Exception as e:
+            raise
+
+    def query(self, sql="", dict_format=True):
+        try:
+            self.open_conn()
+
+            cursor_type = psycopg2.extras.RealDictCursor if dict_format else None
+            with self.__conn.cursor(cursor_factory=cursor_type) as cur:
+                cur.execute(sql)
+                result = cur.fetchall()
+                return result
+
+        except Exception as e:
+            raise
+
+        finally:
+            self.close_conn()
+
+    def execute(self, sql="", auto_commit=True):
+        try:
+            self.open_conn()
+
+            if auto_commit:
+                with self.__conn.cursor() as cur:
+                    cur.execute(sql)
+                    self.commit()
+
+                self.close_conn()
+
+            else:
+                if self.__cursor is None or self.__cursor.closed:
+                    self.__cursor = self.__conn.cursor()
+
+                self.__cursor.execute(sql)
+
+        except Exception as e:
+            raise
+    
+    def execute_many(self, sql="", data=[], auto_commit=True):
+        try:
+            pass
+
+        except Exception as e:
+            raise
+
+    def commit(self):
+        try:
+            if self.__conn and self.is_opened():
+                self.__conn.commit()
+
+            if self.__cursor and not self.__cursor.closed:
+                self.__cursor.close()
+
+        except Exception as e:
+            raise
+
+        finally:
+            self.close_conn()
+
+    def rollback(self):
+        try:
+            if self.__conn and self.is_opened():
+                self.__conn.rollback()
+
+            if self.__cursor and not self.__cursor.closed:
+                self.__cursor.close()
+
+        except Exception as e:
+            raise
+
+        finally:
+            self.close_conn()

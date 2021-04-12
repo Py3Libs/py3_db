@@ -21,11 +21,11 @@ class IDatabase(abc.ABC):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def execute(self, sql:str):
+    def execute(self, sql:str, auto_commit:bool):
         raise NotImplementedError
     
     @abc.abstractmethod
-    def execute_many(self, sql:str, data:list):
+    def execute_many(self, sql:str, data:list, auto_commit:bool):
         raise NotImplementedError
 
     @abc.abstractmethod

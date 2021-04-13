@@ -193,7 +193,7 @@ class PostgresDatabase(IDatabase):
                 )
 
         except Exception as e:
-            raise
+            raise e
 
     def close_conn(self):
         try:
@@ -201,7 +201,7 @@ class PostgresDatabase(IDatabase):
                 self.__conn.close()
 
         except Exception as e:
-            raise
+            raise e
 
     def is_opened(self) -> bool:
         try:
@@ -211,7 +211,7 @@ class PostgresDatabase(IDatabase):
             return False
 
         except Exception as e:
-            raise
+            raise e
 
     def query(self, sql="", dict_format=True):
         try:
@@ -224,7 +224,7 @@ class PostgresDatabase(IDatabase):
                 return result
 
         except Exception as e:
-            raise
+            raise e
 
         finally:
             self.close_conn()
@@ -247,14 +247,14 @@ class PostgresDatabase(IDatabase):
                 self.__cursor.execute(sql)
 
         except Exception as e:
-            raise
+            raise e
     
     def execute_many(self, sql="", data=[], auto_commit=True):
         try:
             pass
 
         except Exception as e:
-            raise
+            raise e
 
     def commit(self):
         try:
@@ -265,7 +265,7 @@ class PostgresDatabase(IDatabase):
                 self.__cursor.close()
 
         except Exception as e:
-            raise
+            raise e
 
         finally:
             self.close_conn()
@@ -279,7 +279,7 @@ class PostgresDatabase(IDatabase):
                 self.__cursor.close()
 
         except Exception as e:
-            raise
+            raise e
 
         finally:
             self.close_conn()

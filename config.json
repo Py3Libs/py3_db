@@ -1,0 +1,26 @@
+{
+    "ORACLE":{
+        "ORA_DB1":{
+            "host":"",
+            "port":5673,
+            "dbname":"",
+            "username":"",
+            "password":"",
+            "encode":"utf-8",
+            "tns":"",
+            "schema":""
+        }
+    },
+    "POSTGRES":{
+        "PG_DB1":{
+            "host":"",
+            "port":5673,
+            "dbname":"",
+            "username":"",
+            "password":"",
+            "encode":"utf-8",
+            "tns":"",
+            "schema":""
+        }
+    }
+}
